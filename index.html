@@ -1,0 +1,739 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IsoHealthGuide SA | Your Health, Your Language</title>
+  <meta name="description" content="Multilingual health information, appointment planning and consultation preparation in South Africa.">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --green: #146b58;
+      --dark: #153b35;
+      --mint: #e8f5ee;
+      --cream: #fafbf8;
+      --text: #253a36;
+      --muted: #647771;
+      --border: #dce8e1;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    button, input, select { font: inherit; }
+
+    button { cursor: pointer; }
+
+    button:focus-visible, input:focus-visible,
+    select:focus-visible {
+      outline: 3px solid #69bfa4;
+      outline-offset: 2px;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand {
+      color: var(--dark);
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -.6px;
+    }
+
+    .brand span { color: #299778; }
+
+    .btn {
+      border: 0;
+      border-radius: 9px;
+      background: var(--green);
+      color: white;
+      padding: 12px 20px;
+      font-weight: 650;
+    }
+
+    .btn.secondary {
+      background: white;
+      color: var(--green);
+      border: 1px solid var(--green);
+    }
+
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .hero {
+      background: linear-gradient(130deg, #e5f5e9, #f8fbf7 70%);
+      padding: 85px 8%;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      align-items: center;
+      gap: 50px;
+    }
+
+    .eyebrow {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      color: var(--dark);
+      font-size: clamp(38px, 5vw, 64px);
+      line-height: 1.12;
+      letter-spacing: -2px;
+      margin: 16px 0 24px;
+    }
+
+    h2 { color: var(--dark); }
+
+    .hero p {
+      max-width: 530px;
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    .hero-card {
+      background: white;
+      border-radius: 22px;
+      padding: 35px;
+      box-shadow: 0 20px 55px #153b3514;
+    }
+
+    .hero-card h2 { margin-top: 0; }
+
+    .feature {
+      display: flex;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feature:last-child { border: 0; }
+
+    .feature-icon {
+      background: var(--mint);
+      border-radius: 10px;
+      padding: 9px 13px;
+      height: fit-content;
+    }
+
+    .feature strong { display: block; }
+    .feature small { color: var(--muted); }
+
+    section.content {
+      padding: 65px 8%;
+      max-width: 1250px;
+      margin: auto;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 25px;
+    }
+
+    .card h3 { color: var(--dark); }
+
+    .auth-container {
+      max-width: 470px;
+      margin: 45px auto;
+      background: white;
+      padding: 32px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 6px;
+      font-weight: 650;
+      font-size: 14px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #cbdcd3;
+      border-radius: 9px;
+      background: white;
+      color: var(--text);
+    }
+
+    form .btn { width: 100%; margin-top: 20px; }
+
+    .link-button {
+      border: none;
+      background: none;
+      color: var(--green);
+      font-weight: 700;
+      text-decoration: underline;
+      padding: 8px;
+    }
+
+    .message {
+      margin: 15px 0;
+      padding: 12px;
+      border-radius: 9px;
+      background: var(--mint);
+      color: var(--dark);
+    }
+
+    .message.error {
+      background: #fff0ed;
+      color: #963a2d;
+    }
+
+    .dashboard {
+      max-width: 1100px;
+      margin: 35px auto;
+      padding: 0 20px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+
+    .appointment {
+      border: 1px solid var(--border);
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 12px;
+    }
+
+    .appointment strong { display: block; }
+
+    .muted { color: var(--muted); }
+
+    .notice {
+      background: #fff7e6;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    footer {
+      padding: 35px 8%;
+      text-align: center;
+      background: var(--dark);
+      color: white;
+      margin-top: 60px;
+    }
+
+    [hidden] { display: none !important; }
+
+    @media(max-width: 800px) {
+      .hero { grid-template-columns: 1fr; padding: 50px 6%; }
+      .cards, .dashboard-grid { grid-template-columns: 1fr; }
+      header { padding: 15px 5%; }
+      .brand { font-size: 18px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">iso<span>healthguide</span> SA</div>
+  <button id="headerAction" class="btn secondary" type="button">
+    Patient Login
+  </button>
+</header>
+
+<main>
+  <div id="statusMessage" role="status" aria-live="polite"
+       style="max-width:900px;margin:15px auto;padding:0 20px"></div>
+
+  <div id="homeView">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Healthcare information made accessible</div>
+        <h1>Better health conversations begin here.</h1>
+        <p>
+          Understand general health information, prepare for appointments
+          and stay organised with IsoHealthGuide SA.
+        </p>
+        <p>
+          Designed for South Africa, with multilingual support planned.
+        </p>
+        <button id="getStarted" class="btn" type="button">
+          Get Started
+        </button>
+      </div>
+
+      <div class="hero-card">
+        <h2>Healthcare support that travels with you.</h2>
+
+        <div class="feature">
+          <div class="feature-icon">🌍</div>
+          <div>
+            <strong>Language accessibility</strong>
+            <small>Multilingual health information is in development.</small>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon">📅</div>
+          <div>
+            <strong>Appointment planning</strong>
+            <small>Organise upcoming healthcare appointments.</small>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon">🔔</div>
+          <div>
+            <strong>Reminder preferences</strong>
+            <small>Set when you would like appointment reminders.</small>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon">💬</div>
+          <div>
+            <strong>WhatsApp assistance</strong>
+            <small>Integration coming in a later development phase.</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content">
+      <div class="eyebrow">Our services</div>
+      <h2>Simple tools for your healthcare journey</h2>
+
+      <div class="cards">
+        <article class="card">
+          <h3>Health information</h3>
+          <p>Access general health education and prepare questions for a healthcare professional.</p>
+        </article>
+
+        <article class="card">
+          <h3>Appointment organiser</h3>
+          <p>Keep your upcoming healthcare appointments together in one place.</p>
+        </article>
+
+        <article class="card">
+          <h3>Consultation preparation</h3>
+          <p>Prepare for healthcare visits with clear, practical checklists.</p>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <section id="authView" class="auth-container" hidden>
+    <div class="eyebrow">Patient access</div>
+    <h2 id="authTitle">Create an account</h2>
+
+    <form id="authForm">
+      <div id="nameField">
+        <label for="fullName">Full name</label>
+        <input id="fullName" autocomplete="name" maxlength="120">
+      </div>
+
+      <label for="email">Email address</label>
+      <input id="email" type="email" autocomplete="email" required>
+
+      <label for="password">Password</label>
+      <input id="password" type="password" minlength="12"
+             autocomplete="new-password" required>
+
+      <button id="authSubmit" class="btn" type="submit">
+        Create account
+      </button>
+    </form>
+
+    <p id="authMessage" role="status" aria-live="polite"></p>
+
+    <button id="switchAuth" class="link-button" type="button">
+      Already have an account? Sign in
+    </button>
+
+    <p class="muted" style="font-size:13px">
+      Development environment only. Use fictional information
+      and test email accounts. Do not enter real patient information.
+    </p>
+  </section>
+
+  <section id="dashboardView" class="dashboard" hidden>
+    <div class="eyebrow">Patient portal</div>
+    <h2>Welcome to your dashboard</h2>
+    <p id="accountEmail" class="muted"></p>
+
+    <div class="notice">
+      Development prototype: use fictional appointments only.
+      This platform is not for emergencies or medical diagnosis.
+      WhatsApp reminders are not yet active.
+    </div>
+
+    <div class="dashboard-grid" style="margin-top:24px">
+      <div class="card">
+        <h3>Add an appointment</h3>
+
+        <form id="appointmentForm">
+          <label for="clinicName">Clinic or facility</label>
+          <input id="clinicName" maxlength="150" required
+                 placeholder="Example Test Clinic">
+
+          <label for="appointmentDate">Appointment date and time</label>
+          <input id="appointmentDate" type="datetime-local" required>
+
+          <label for="reminderHours">Reminder preference</label>
+          <select id="reminderHours">
+            <option value="0">No reminder</option>
+            <option value="24">24 hours before</option>
+            <option value="48">48 hours before</option>
+            <option value="2">2 hours before</option>
+          </select>
+
+          <button class="btn" type="submit">Save appointment</button>
+        </form>
+        <p id="appointmentMessage" role="status" aria-live="polite"></p>
+      </div>
+
+      <div class="card">
+        <h3>Upcoming appointments</h3>
+        <div id="appointmentList" aria-live="polite">
+          Loading appointments...
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Consultation preparation</h3>
+        <p>Before your appointment, consider:</p>
+        <ul>
+          <li>Writing down questions you want to ask.</li>
+          <li>Preparing a list of medicines you take.</li>
+          <li>Bringing relevant documents if needed.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>WhatsApp reminders</h3>
+        <p>
+          Your reminder preferences can be saved here.
+          Automated delivery will be enabled after our secure
+          backend and WhatsApp Cloud API are connected.
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <strong>IsoHealthGuide SA</strong>
+  <p>Your Health. Your Language. Your Journey.</p>
+  <small>Development prototype · Not an emergency or diagnostic service</small>
+</footer>
+
+<script>
+  // Replace these with your own Supabase public configuration.
+  // NEVER use a service_role key, secret key or database password.
+  const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+  const SUPABASE_PUBLISHABLE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+  const configured =
+    SUPABASE_URL.startsWith("https://") &&
+    !SUPABASE_URL.includes("YOUR_") &&
+    !SUPABASE_PUBLISHABLE_KEY.includes("YOUR_");
+
+  const db = configured
+    ? window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      )
+    : null;
+
+  const $ = id => document.getElementById(id);
+
+  let currentUser = null;
+  let authMode = "signup";
+
+  function showView(view) {
+    ["homeView", "authView", "dashboardView"].forEach(id => {
+      $(id).hidden = id !== view;
+    });
+
+    $("headerAction").textContent =
+      view === "dashboardView" ? "Sign Out" :
+      view === "authView" ? "Home" : "Patient Login";
+  }
+
+  function message(elementId, text, error = false) {
+    const element = $(elementId);
+    element.textContent = text;
+    element.className = error ? "message error" : "message";
+  }
+
+  function setAuthMode(mode) {
+    authMode = mode;
+    const signup = mode === "signup";
+
+    $("authTitle").textContent =
+      signup ? "Create an account" : "Welcome back";
+
+    $("authSubmit").textContent =
+      signup ? "Create account" : "Sign in";
+
+    $("nameField").hidden = !signup;
+
+    $("password").autocomplete =
+      signup ? "new-password" : "current-password";
+
+    $("switchAuth").textContent = signup
+      ? "Already have an account? Sign in"
+      : "New here? Create an account";
+
+    $("authMessage").textContent = "";
+  }
+
+  $("getStarted").addEventListener("click", () => {
+    setAuthMode("signup");
+    showView("authView");
+  });
+
+  $("switchAuth").addEventListener("click", () => {
+    setAuthMode(authMode === "signup" ? "signin" : "signup");
+  });
+
+  $("headerAction").addEventListener("click", async () => {
+    if (!$("dashboardView").hidden && db) {
+      await db.auth.signOut();
+      currentUser = null;
+      showView("homeView");
+    } else if (!$("authView").hidden) {
+      showView("homeView");
+    } else {
+      setAuthMode("signin");
+      showView("authView");
+    }
+  });
+
+  $("authForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (!db) {
+      message("authMessage",
+        "Supabase is not connected yet. Add your project URL and publishable key.",
+        true);
+      return;
+    }
+
+    const email = $("email").value.trim();
+    const password = $("password").value;
+
+    $("authSubmit").disabled = true;
+
+    try {
+      if (authMode === "signup") {
+        const { error } = await db.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin +
+              window.location.pathname
+          }
+        });
+
+        if (error) throw error;
+
+        message("authMessage",
+          "Registration request received. Check your email for a confirmation link if one was sent.");
+      } else {
+        const { error } = await db.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+        await loadSession();
+      }
+    } catch (error) {
+      message("authMessage", error.message, true);
+    } finally {
+      $("authSubmit").disabled = false;
+    }
+  });
+
+  async function loadSession() {
+    if (!db) return;
+
+    const { data, error } = await db.auth.getUser();
+
+    if (error || !data.user) {
+      currentUser = null;
+      showView("homeView");
+      return;
+    }
+
+    currentUser = data.user;
+    $("accountEmail").textContent = currentUser.email || "";
+    showView("dashboardView");
+    await loadAppointments();
+  }
+
+  $("appointmentForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (!db || !currentUser) return;
+
+    const clinic = $("clinicName").value.trim();
+    const dateInput = $("appointmentDate").value;
+    const hours = Number($("reminderHours").value);
+    const date = new Date(dateInput);
+
+    if (!clinic || !dateInput || Number.isNaN(date.getTime())) {
+      message("appointmentMessage", "Enter a valid appointment.", true);
+      return;
+    }
+
+    if (date <= new Date()) {
+      message("appointmentMessage",
+        "Please select a future appointment.", true);
+      return;
+    }
+
+    const { error } = await db.from("appointments").insert({
+      patient_id: currentUser.id,
+      clinic_name: clinic,
+      appointment_date: date.toISOString(),
+      reminder_enabled: hours > 0,
+      reminder_hours_before: hours || 24,
+      status: "scheduled"
+    });
+
+    if (error) {
+      message("appointmentMessage", error.message, true);
+      return;
+    }
+
+    message("appointmentMessage", "Test appointment saved successfully.");
+    $("appointmentForm").reset();
+    await loadAppointments();
+  });
+
+  async function loadAppointments() {
+    if (!db || !currentUser) return;
+
+    const list = $("appointmentList");
+    list.textContent = "Loading...";
+
+    const { data, error } = await db
+      .from("appointments")
+      .select("id,clinic_name,appointment_date,status,reminder_enabled,reminder_hours_before")
+      .eq("patient_id", currentUser.id)
+      .eq("status", "scheduled")
+      .gte("appointment_date", new Date().toISOString())
+      .order("appointment_date", { ascending: true });
+
+    if (error) {
+      list.textContent = "Unable to load appointments: " + error.message;
+      return;
+    }
+
+    list.replaceChildren();
+
+    if (!data.length) {
+      list.textContent = "No upcoming appointments.";
+      return;
+    }
+
+    data.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "appointment";
+
+      const title = document.createElement("strong");
+      title.textContent = item.clinic_name;
+
+      const date = document.createElement("div");
+      date.textContent = new Date(item.appointment_date)
+        .toLocaleString("en-ZA", {
+          dateStyle: "medium",
+          timeStyle: "short"
+        });
+
+      const reminder = document.createElement("small");
+      reminder.className = "muted";
+      reminder.textContent = item.reminder_enabled
+        ? "Reminder preference: " +
+          item.reminder_hours_before + " hours before"
+        : "No reminder selected";
+
+      const cancel = document.createElement("button");
+      cancel.className = "link-button";
+      cancel.type = "button";
+      cancel.textContent = "Cancel appointment entry";
+
+      cancel.addEventListener("click", async () => {
+        const { error } = await db
+          .from("appointments")
+          .update({ status: "cancelled" })
+          .eq("id", item.id)
+          .eq("patient_id", currentUser.id);
+
+        if (error) {
+          alert("Unable to update appointment.");
+        } else {
+          await loadAppointments();
+        }
+      });
+
+      card.append(title, date, reminder, cancel);
+      list.append(card);
+    });
+  }
+
+  async function initialise() {
+    if (!db) {
+      message("statusMessage",
+        "Development setup: Supabase configuration is required before registration and appointments will work.");
+      return;
+    }
+
+    const { data } = await db.auth.getSession();
+
+    if (data.session) {
+      await loadSession();
+    }
+
+    db.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        currentUser = null;
+        showView("homeView");
+      } else if (event === "SIGNED_IN" && session) {
+        // Defer additional Supabase calls outside the auth callback.
+        setTimeout(loadSession, 0);
+      }
+    });
+  }
+
+  initialise();
+</script>
+
+</body>
+</html>
