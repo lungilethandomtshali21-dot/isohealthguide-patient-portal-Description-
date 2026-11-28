@@ -435,7 +435,61 @@
       </div>
 
       <div class="card">
-        <h3>WhatsApp reminders</h3>
+       
+<div class="card">
+  <h3>WhatsApp Reminder Preferences</h3>
+
+  <p class="muted">
+    Choose whether you want to receive appointment
+    reminders through WhatsApp when this service
+    becomes available.
+  </p>
+
+  <p>
+    <strong>Current status:</strong>
+    <span id="consentStatus">Checking...</span>
+  </p>
+
+  <label style="display:flex;gap:10px;align-items:flex-start">
+    <input
+      type="checkbox"
+      id="dashboardWhatsappConsent"
+      style="width:auto;margin-top:5px"
+    >
+    <span>
+      I agree to receive appointment reminders
+      from IsoHealthGuide SA through WhatsApp.
+      I understand that I can withdraw my consent
+      at any time.
+    </span>
+  </label>
+
+  <button
+    id="saveWhatsappConsent"
+    class="btn"
+    type="button"
+    style="margin-top:15px"
+  >
+    Save Preference
+  </button>
+
+  <button
+    id="withdrawWhatsappConsent"
+    class="btn secondary"
+    type="button"
+    style="margin-top:10px"
+  >
+    Withdraw WhatsApp Consent
+  </button>
+
+  <p id="consentMessage" role="status" aria-live="polite"></p>
+
+  <p class="muted" style="font-size:13px">
+    WhatsApp reminders are not yet active.
+    No messages will be sent during this development phase.
+  </p>
+</div>
+
         <p>
           Your reminder preferences can be saved here.
           Automated delivery will be enabled after our secure
