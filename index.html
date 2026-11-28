@@ -403,7 +403,8 @@
           <label for="appointmentDate">Appointment date and time</label>
           <input id="appointmentDate" type="datetime-local" required>
 
-          <label for="reminderHours">Reminder preference</label>
+           <label for="reminderHours">   
+             When would you like your appointment reminder? </label>  <select id="reminderHours">   <option value="24" selected>     24 hours before (Recommended)   </option>   <option value="48">48 hours before</option>   <option value="12">12 hours before</option>   <option value="2">2 hours before</option>   <option value="0">No reminder</option> </select>  <p class="muted" style="font-size:13px">   You can choose when to receive a reminder.   WhatsApp reminders are not yet active. </p>  <div style="margin-top:20px">   <label style="display:flex;gap:10px;align-items:flex-start">     <input       type="checkbox"       id="whatsappConsent"       style="width:auto;margin-top:5px"     >     <span>       I agree to receive appointment reminders       through WhatsApp when this service becomes       available. I understand that I can withdraw       my consent.     </span>   </label> </div>
           <select id="reminderHours">
             <option value="0">No reminder</option>
             <option value="24">24 hours before</option>
