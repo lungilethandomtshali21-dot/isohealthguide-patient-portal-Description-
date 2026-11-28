@@ -794,6 +794,70 @@ const whatsappConsent =
   }
 
   initialise();
+  
+async function loadWhatsappConsent() {
+  if (!db || !currentUser) return;
+
+  const { data, error } = await db
+    .from("patient_whatsapp_consents")
+    .select("consent_given")
+    .eq("patient_id", currentUser.id)
+    .maybeSingle();
+
+  if (error) {
+    $("consentStatus").textContent = "Unable to load";
+    message("consentMessage", error.message, true);
+    return;
+  }
+
+  const consent = data?.consent_given === true;
+
+  $("dashboardWhatsappConsent").checked = consent;
+  $("consentStatus").textContent =
+    consent ? "Consent recorded" : "Not consented";
+}
+
+async function saveConsent(value) {
+  if (!db || !currentUser) return;
+
+  const saveButton = $("saveWhatsappConsent");
+  const withdrawButton = $("withdrawWhatsappConsent");
+
+  saveButton.disabled = true;
+  withdrawButton.disabled = true;
+
+  try {
+    const { error } = await db.rpc(
+      "set_my_whatsapp_consent",
+      { p_consent: value }
+    );
+
+    if (error) throw error;
+
+    await loadWhatsappConsent();
+
+    message(
+      "consentMessage",
+      value
+        ? "Your WhatsApp consent preference has been saved."
+        : "Your WhatsApp consent has been withdrawn."
+    );
+  } catch (error) {
+    message("consentMessage", error.message, true);
+  } finally {
+    saveButton.disabled = false;
+    withdrawButton.disabled = false;
+  }
+}
+
+$("saveWhatsappConsent").addEventListener("click", () => {
+  saveConsent($("dashboardWhatsappConsent").checked);
+});
+
+$("withdrawWhatsappConsent").addEventListener("click", () => {
+  saveConsent(false);
+});
+
 </script>
 
 </body>
