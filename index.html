@@ -606,6 +606,12 @@
     const clinic = $("clinicName").value.trim();
     const dateInput = $("appointmentDate").value;
     const hours = Number($("reminderHours").value);
+const whatsappConsent =
+  $("whatsappConsent").checked;
+
+// Consent is not yet persisted.
+// WhatsApp sending must remain disabled.
+
     const date = new Date(dateInput);
 
     if (!clinic || !dateInput || Number.isNaN(date.getTime())) {
